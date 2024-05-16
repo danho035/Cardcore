@@ -7,7 +7,6 @@ public class TileInfoGenerator : MonoBehaviour
 {
     public GridLayoutGroup gridLayoutGroup; // 체크할 그리드 레이아웃 그룹
     private Vector2 lastCellSize; // 마지막에 저장된 셀 사이즈
-    private Vector2 lastSpacing; // 마지막에 저장된 간격
     private List<TileInfo> tilePositions = new List<TileInfo>(); // 타일의 좌표와 이름 리스트
 
     void Start()
@@ -32,10 +31,8 @@ public class TileInfoGenerator : MonoBehaviour
         {
             // 이전에 저장된 값 업데이트
             lastCellSize = gridLayoutGroup.cellSize;
-            lastSpacing = gridLayoutGroup.spacing;
 
             Debug.Log("셀 사이즈: " + lastCellSize);
-            Debug.Log("간격: " + lastSpacing);
         }
         else
         {
@@ -48,7 +45,7 @@ public class TileInfoGenerator : MonoBehaviour
         if (gridLayoutGroup != null)
         {
             // 현재 값과 이전 값 비교하여 변경 여부 확인
-            return lastCellSize != gridLayoutGroup.cellSize || lastSpacing != gridLayoutGroup.spacing;
+            return lastCellSize != gridLayoutGroup.cellSize;
         }
         else
         {
@@ -83,11 +80,27 @@ public class TileInfoGenerator : MonoBehaviour
             int row = i / columns;
             int column = i % columns;
 
+            // 타일의 크기 가져오기
+            RectTransform rectTransform = childTransform.GetComponent<RectTransform>();
+            Vector2 tileSize = rectTransform.sizeDelta;
+
             // 좌표값 가져오기
             Vector3 position = childTransform.position;
 
-            // 리스트에 추가 (행, 열, x좌표, y좌표, 이름)
-            tilePositions.Add(new TileInfo(row, column, position.x, position.y, name, lastCellSize, lastSpacing));
+            // 간격 계산
+            float horizontalSpacing = 0f;
+            float verticalSpacing = 0f;
+            if (column > 0)
+            {
+                horizontalSpacing = Mathf.Abs(transform.GetChild(i - 1).position.x - position.x) - tileSize.x;
+            }
+            if (row > 0)
+            {
+                verticalSpacing = Mathf.Abs(transform.GetChild(i - columns).position.y - position.y) - tileSize.y;
+            }
+
+            // 리스트에 추가 (행, 열, x좌표, y좌표, 이름, 가로 간격, 세로 간격)
+            tilePositions.Add(new TileInfo(row, column, position.x, position.y, name, tileSize, horizontalSpacing, verticalSpacing));
         }
 
         // 리스트를 체크할 수 있는 디버그 로그 추가
@@ -106,24 +119,26 @@ public class TileInfoGenerator : MonoBehaviour
         public float x;
         public float y;
         public string name;
-        public Vector2 cellSize;
-        public Vector2 spacing;
+        public Vector2 tileSize;
+        public float horizontalSpacing;
+        public float verticalSpacing;
 
-        public TileInfo(int row, int column, float x, float y, string name, Vector2 cellSize, Vector2 spacing)
+        public TileInfo(int row, int column, float x, float y, string name, Vector2 tileSize, float horizontalSpacing, float verticalSpacing)
         {
             this.row = row;
             this.column = column;
             this.x = x;
             this.y = y;
             this.name = name;
-            this.cellSize = cellSize;
-            this.spacing = spacing;
+            this.tileSize = tileSize;
+            this.horizontalSpacing = horizontalSpacing;
+            this.verticalSpacing = verticalSpacing;
         }
 
         public override string ToString()
         {
             return "이름: " + name + ", 행: " + row + ", 열: " + column + ", X 좌표: " + x + ", Y 좌표: " + y
-                + ", 셀 사이즈: " + cellSize + ", 간격: " + spacing;
+                + ", 타일 사이즈: " + tileSize + ", 가로 간격: " + horizontalSpacing + ", 세로 간격: " + verticalSpacing;
         }
     }
 

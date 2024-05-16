@@ -4,9 +4,22 @@ using UnityEngine;
 
 public class UnitSpawner : MonoBehaviour
 {
-    public int enemySpawnCount; // 적 스폰 횟수
+    public GameObject[] monsterPrefabs; // 생성할 적 오브젝트 프리팹 배열
+    public int monsterCount; // 적 스폰 횟수
     public int allySpawnCount; // 아군 스폰 횟수
-    private int playerSpanwCount = 1; // 플레이어 스폰 횟수
+    private int playerSpawnCount = 1; // 플레이어 스폰 횟수
+
+    void Start()
+    {
+        StartCoroutine(StartEnemySpawnDelayed()); // 일정 시간 뒤에 적 스폰 시작
+    }
+
+    IEnumerator StartEnemySpawnDelayed()
+    {
+        yield return new WaitForSeconds(0.1f); // 0.1초 후에 실행
+
+        TileInfoCheck(); // 타일 정보 가져오기
+    }
 
     void TileInfoCheck() // 타일 정보 가져오기
     {
@@ -23,6 +36,9 @@ public class UnitSpawner : MonoBehaviour
 
                 Debug.Log("타일 정보를 성공적으로 가져왔습니다 - UnitSpawner");
                 Debug.Log("가져온 인덱스 개수: " + count);
+
+                // 적 스폰
+                EnemySpawn(tilePositions, monsterCount);
             }
             else
             {
@@ -33,71 +49,73 @@ public class UnitSpawner : MonoBehaviour
         {
             Debug.LogError("TileInfoGenerator 스크립트를 가진 게임 오브젝트를 찾을 수 없습니다.");
         }
-
     }
 
-    void EnemySpawn(List<TileInfoGenerator.TileInfo> tilePositions)
+    void EnemySpawn(List<TileInfoGenerator.TileInfo> tilePositions, int monsterCount)
     {
-        if (tilePositions != null && tilePositions.Count > 0)
+        List<TileInfoGenerator.TileInfo> eligibleTiles = new List<TileInfoGenerator.TileInfo>(tilePositions);
+        List<TileInfoGenerator.TileInfo> selectedTiles = new List<TileInfoGenerator.TileInfo>();
+
+        // 타일 정보 리스트에서 가장 높은 행 값 찾기
+        int highestRow = -1;
+        foreach (TileInfoGenerator.TileInfo tileInfo in tilePositions)
         {
-            // 가장 작은 행 숫자와 가장 높은 행 숫자를 초기화합니다.
-            int minRow = int.MaxValue;
-            int maxRow = int.MinValue;
-
-            // 가장 작은 행 숫자와 가장 높은 행 숫자를 찾습니다.
-            foreach (TileInfoGenerator.TileInfo info in tilePositions)
+            if (tileInfo.row > highestRow)
             {
-                if (info.row < minRow)
-                {
-                    minRow = info.row;
-                }
-                if (info.row > maxRow)
-                {
-                    maxRow = info.row;
-                }
+                highestRow = tileInfo.row;
             }
+        }
 
-            // 가장 높은 행 숫자는 스폰 위치에서 배제합니다.
-            maxRow--;
-
-            // 스폰할 위치를 결정합니다.
-            List<TileInfoGenerator.TileInfo> spawnPositions = new List<TileInfoGenerator.TileInfo>();
-            foreach (TileInfoGenerator.TileInfo info in tilePositions)
+        // 가장 높은 행 값을 제외한 모든 행을 가진 타일의 인덱스 찾기
+        List<int> eligibleIndexes = new List<int>();
+        for (int i = 0; i < tilePositions.Count; i++)
+        {
+            if (tilePositions[i].row != highestRow)
             {
-                if (info.row != maxRow)
-                {
-                    spawnPositions.Add(info);
-                }
+                eligibleIndexes.Add(i);
             }
+        }
 
-            // 스폰할 위치에서 랜덤하게 선택합니다.
-            if (spawnPositions.Count > 0)
+        // 몬스터 스폰
+        for (int i = 0; i < monsterCount; i++)
+        {
+            TileInfoGenerator.TileInfo spawnTile = null;
+
+            // eligibleIndexes 리스트에서 중복되지 않는 랜덤한 인덱스 선택
+            int randomIndex = Random.Range(0, eligibleIndexes.Count);
+            int selectedIndex = eligibleIndexes[randomIndex];
+
+            // 선택된 인덱스의 타일 정보 가져오기
+            spawnTile = tilePositions[selectedIndex];
+
+            // 해당 위치의 오브젝트 가져오기
+            GameObject tileObject = GameObject.Find(spawnTile.name);
+
+            if (tileObject != null)
             {
-                TileInfoGenerator.TileInfo spawnTile = spawnPositions[Random.Range(0, spawnPositions.Count)];
+                // 해당 오브젝트의 TileCheck 스크립트를 가져옴
+                TileCheck tileCheck = tileObject.GetComponent<TileCheck>();
 
-                Debug.Log("적이 스폰되었습니다. 위치: " + spawnTile.name);
-                // 여기에 적 스폰 로직을 추가하세요.
+                // 해당 오브젝트의 퍼블릭 동적 변수(MeleeAtk, RangeAtk, Player, Enemy) 전부 false인지 확인
+                if (!TileCheck.MeleeAtk && !TileCheck.RangeAtk && !TileCheck.Player && !TileCheck.Enemy)
+                {
+                    // 디버그 로그 출력
+                    Debug.Log("몬스터 " + (i + 1) + " 스폰 위치: " + spawnTile.name);
+
+                    // 선택한 위치를 기록
+                    selectedTiles.Add(spawnTile);
+
+                    // 해당 위치에 몬스터 생성 (리스트의 x, y 좌표를 참조하여 생성)
+                    GameObject monsterPrefab = monsterPrefabs[0]; // 프리팹 리스트의 첫 번째 프리팹 사용
+                    Vector3 spawnPosition = new Vector3(spawnTile.x, spawnTile.y, 0f); // 타일의 x, y 좌표를 사용하여 스폰 위치 설정
+                    Instantiate(monsterPrefab, spawnPosition, Quaternion.identity, tileObject.transform); // 타일을 부모로 설정하여 생성
+                }
             }
             else
             {
-                Debug.LogError("적을 스폰할 수 있는 위치가 없습니다.");
+                // 해당 위치의 오브젝트를 찾을 수 없는 경우 오류 메시지 출력
+                Debug.LogError("이름 '" + spawnTile.name + "'을 가진 오브젝트를 찾을 수 없습니다.");
             }
         }
-        else
-        {
-            Debug.LogError("타일 정보 리스트를 가져올 수 없거나 비어 있습니다.");
-        }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        Invoke("TileInfoCheck", 0.1f);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }
