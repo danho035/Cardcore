@@ -1,111 +1,64 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TileInfoGenerator : MonoBehaviour
 {
-    public GridLayoutGroup gridLayoutGroup; // 체크할 그리드 레이아웃 그룹
-    private Vector2 lastCellSize; // 마지막에 저장된 셀 사이즈
-    private List<TileInfo> tilePositions = new List<TileInfo>(); // 타일의 좌표와 이름 리스트
+    public GridLayoutGroup gridLayoutGroup; // 사용자가 그리드 레이아웃 그룹을 직접 설정할 수 있도록 변수를 public으로 변경
+
+    private List<TileInfo> tileInfos = new List<TileInfo>(); // 타일 정보 리스트
 
     void Start()
     {
-        UpdateGridLayoutProperties(); // 시작할 때 그리드 레이아웃 그룹의 속성을 업데이트합니다.
-        StartCoroutine(CheckChildObjectCoordinatesDelayed()); // 0.01초 후에 자식 오브젝트의 좌표를 체크합니다.
+        // Start() 함수가 호출되고 나서 0.0001초 후에 GenerateTileInfo() 함수를 호출하도록 만듭니다.
+        Invoke("GenerateTileInfo", 0.0001f);
     }
 
-    void Update()
+    void GenerateTileInfo()
     {
-        if (CheckIfPropertiesChanged()) // 속성이 변경되었는지 확인합니다.
+        if (gridLayoutGroup == null)
         {
-            // 변경되었다면 그리드 레이아웃 그룹의 속성과 오브젝트 리스트 변경
-            UpdateGridLayoutProperties();
-            CheckChildObjectCoordinates();
-        }
-    }
-
-    void UpdateGridLayoutProperties()
-    {
-        if (gridLayoutGroup != null)
-        {
-            // 이전에 저장된 값 업데이트
-            lastCellSize = gridLayoutGroup.cellSize;
-
-            Debug.Log("셀 사이즈: " + lastCellSize);
-        }
-        else
-        {
-            Debug.LogError("GridLayoutGroup이 설정되지 않았습니다.");
-        }
-    }
-
-    bool CheckIfPropertiesChanged()
-    {
-        if (gridLayoutGroup != null)
-        {
-            // 현재 값과 이전 값 비교하여 변경 여부 확인
-            return lastCellSize != gridLayoutGroup.cellSize;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    IEnumerator CheckChildObjectCoordinatesDelayed()
-    {
-        yield return new WaitForSeconds(0.01f); // 0.01초 대기 후에 실행됩니다.
-        CheckChildObjectCoordinates();
-    }
-
-    void CheckChildObjectCoordinates()
-    {
-        // 그리드 열과 행 수 가져오기
-        int columns = gridLayoutGroup.constraintCount;
-        int rows = transform.childCount / columns;
-
-        // 리스트 초기화
-        tilePositions.Clear();
-
-        // 각 자식 오브젝트의 좌표와 이름을 체크하고 리스트에 추가합니다.
-        for (int i = 0; i < transform.childCount; i++)
-        {
-            Transform childTransform = transform.GetChild(i); // 캐싱
-
-            // 오브젝트 이름 가져오기
-            string name = childTransform.name;
-
-            // 오브젝트 이름에서 행(row)과 열(column) 추출
-            int row = i / columns;
-            int column = i % columns;
-
-            // 타일의 크기 가져오기
-            RectTransform rectTransform = childTransform.GetComponent<RectTransform>();
-            Vector2 tileSize = rectTransform.sizeDelta;
-
-            // 좌표값 가져오기
-            Vector3 position = childTransform.position;
-
-            // 간격 계산
-            float horizontalSpacing = 0f;
-            float verticalSpacing = 0f;
-            if (column > 0)
-            {
-                horizontalSpacing = Mathf.Abs(transform.GetChild(i - 1).position.x - position.x) - tileSize.x;
-            }
-            if (row > 0)
-            {
-                verticalSpacing = Mathf.Abs(transform.GetChild(i - columns).position.y - position.y) - tileSize.y;
-            }
-
-            // 리스트에 추가 (행, 열, x좌표, y좌표, 이름, 가로 간격, 세로 간격)
-            tilePositions.Add(new TileInfo(row, column, position.x, position.y, name, tileSize, horizontalSpacing, verticalSpacing));
+            Debug.LogError("Grid Layout Group이 설정되지 않았습니다.");
+            return;
         }
 
-        // 리스트를 체크할 수 있는 디버그 로그 추가
-        Debug.Log("타일 좌표 정보: ");
-        foreach (TileInfo info in tilePositions)
+        int columns = gridLayoutGroup.constraintCount; // 열 수
+        int rows = gridLayoutGroup.transform.childCount / columns; // 행 수
+
+        // 간격 정보 가져오기
+        float spacing = gridLayoutGroup.spacing.x;
+
+        // 셀 사이즈 가져오기
+        Vector2 cellSize = gridLayoutGroup.cellSize;
+        float cellWidth = cellSize.x;
+        float cellHeight = cellSize.y;
+
+        RectTransform gridRectTransform = gridLayoutGroup.GetComponent<RectTransform>();
+
+        for (int i = 0; i < gridLayoutGroup.transform.childCount; i++)
+        {
+            RectTransform tileRectTransform = gridLayoutGroup.transform.GetChild(i) as RectTransform;
+
+            // 타일 정보 생성
+            TileInfo tileInfo = new TileInfo();
+            tileInfo.tileName = tileRectTransform.name;
+            tileInfo.row = i / columns;
+            tileInfo.column = i % columns;
+
+            // 타일의 anchoredPosition을 사용하여 실제 위치 가져오기
+            tileInfo.posX = tileRectTransform.anchoredPosition.x;
+            tileInfo.posY = tileRectTransform.anchoredPosition.y;
+
+            tileInfo.width = cellWidth;
+            tileInfo.height = cellHeight;
+            tileInfo.spacing = spacing;
+
+            tileInfos.Add(tileInfo); // 리스트에 타일 정보 추가
+        }
+
+        // 타일 정보 출력
+        Debug.Log("타일 정보:");
+        foreach (TileInfo info in tileInfos)
         {
             Debug.Log(info.ToString());
         }
@@ -114,37 +67,25 @@ public class TileInfoGenerator : MonoBehaviour
     // 타일 정보를 담는 클래스
     public class TileInfo
     {
+        public string tileName;
         public int row;
         public int column;
-        public float x;
-        public float y;
-        public string name;
-        public Vector2 tileSize;
-        public float horizontalSpacing;
-        public float verticalSpacing;
-
-        public TileInfo(int row, int column, float x, float y, string name, Vector2 tileSize, float horizontalSpacing, float verticalSpacing)
-        {
-            this.row = row;
-            this.column = column;
-            this.x = x;
-            this.y = y;
-            this.name = name;
-            this.tileSize = tileSize;
-            this.horizontalSpacing = horizontalSpacing;
-            this.verticalSpacing = verticalSpacing;
-        }
+        public float posX;
+        public float posY;
+        public float width;
+        public float height;
+        public float spacing;
 
         public override string ToString()
         {
-            return "이름: " + name + ", 행: " + row + ", 열: " + column + ", X 좌표: " + x + ", Y 좌표: " + y
-                + ", 타일 사이즈: " + tileSize + ", 가로 간격: " + horizontalSpacing + ", 세로 간격: " + verticalSpacing;
+            return "이름: " + tileName + ", 행: " + row + ", 열: " + column + ", Pos X: " + posX + ", Pos Y: " + posY
+                + ", Width: " + width + ", Height: " + height + ", Spacing: " + spacing;
         }
     }
 
-    // 외부에서 tilePositions 리스트에 접근할 수 있도록 하는 메서드
-    public List<TileInfo> GetTilePositions()
+    // 타일 정보 리스트를 반환하는 메서드
+    public List<TileInfo> GetTileInfos()
     {
-        return tilePositions;
+        return tileInfos;
     }
 }
