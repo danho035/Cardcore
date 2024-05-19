@@ -301,7 +301,7 @@ MonoBehaviour:
   tileInfoGenerator: {fileID: 1854590796}
   Monster11Count: 3
   Monster21Count: 1
-  Monster31Count: 0
+  Monster31Count: 1
   monster31Prefab: {fileID: 658088664}
   monster21Prefab: {fileID: 793858960}
   monster11Prefab: {fileID: 1828788061}
