@@ -22,9 +22,13 @@ public class TileInfoGenerator : MonoBehaviour
         }
 
         int columns = gridLayoutGroup.constraintCount; // 열 수
+        int rows = Mathf.CeilToInt((float)gridLayoutGroup.transform.childCount / columns); // 행 수
 
         // 간격 정보 가져오기
         float spacing = gridLayoutGroup.spacing.x;
+
+        // 타일 크기 가져오기
+        Vector2 tileSize = gridLayoutGroup.cellSize;
 
         for (int i = 0; i < gridLayoutGroup.transform.childCount; i++)
         {
@@ -39,6 +43,10 @@ public class TileInfoGenerator : MonoBehaviour
             // 타일의 anchoredPosition을 사용하여 실제 위치 가져오기
             tileInfo.posX = tileRectTransform.anchoredPosition.x;
             tileInfo.posY = tileRectTransform.anchoredPosition.y;
+
+            // 타일 크기 및 간격 정보 추가
+            tileInfo.tileSize = tileSize;
+            tileInfo.spacing = spacing;
 
             tileInfos.Add(tileInfo); // 리스트에 타일 정보 추가
         }
@@ -59,10 +67,13 @@ public class TileInfoGenerator : MonoBehaviour
         public int column;
         public float posX;
         public float posY;
+        public Vector2 tileSize; // 타일 크기
+        public float spacing; // 간격
 
         public override string ToString()
         {
-            return "이름: " + tileName + ", 행: " + row + ", 열: " + column + ", Pos X: " + posX + ", Pos Y: " + posY;
+            return "이름: " + tileName + ", 행: " + row + ", 열: " + column + ", Pos X: " + posX + ", Pos Y: " + posY
+                + ", 타일 크기: " + tileSize + ", 간격: " + spacing;
         }
     }
 

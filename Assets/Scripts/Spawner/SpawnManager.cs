@@ -46,22 +46,22 @@ public class SpawnManager : MonoBehaviour
         }
 
         // TileInfoGenerator 클래스의 GetTileInfos 메서드를 사용하여 타일 정보 가져오기
-        List<TileInfoGenerator.TileInfo> tileInfos = tileInfoGenerator.GetTileInfos();
+        var tileInfos = tileInfoGenerator.GetTileInfos();
 
         // 부모 오브젝트의 Transform 가져오기
         Transform spawnParentTransform = spawnParent.transform;
 
-        BossMonsterSpawner bossSpawner = new BossMonsterSpawner();
+        Boss bossSpawner = spawnParent.gameObject.AddComponent<Boss>();
         bossSpawner.MonsterCount = bossCount;
         bossSpawner.SetTileInfos(tileInfos);
         bossSpawner.SpawnMonster(bossPrefab, spawnParentTransform);
 
-        MiddleMonsterSpawner middleSpawner = new MiddleMonsterSpawner();
+        Middle middleSpawner = spawnParent.gameObject.AddComponent<Middle>();
         middleSpawner.MonsterCount = middleCount;
         middleSpawner.SetTileInfos(tileInfos);
         middleSpawner.SpawnMonster(middlePrefab, spawnParentTransform);
 
-        NormalMonsterSpawner normalSpawner = new NormalMonsterSpawner();
+        Normal normalSpawner = spawnParent.gameObject.AddComponent<Normal>();
         normalSpawner.MonsterCount = normalCount;
         normalSpawner.SetTileInfos(tileInfos);
         normalSpawner.SpawnMonster(normalPrefab, spawnParentTransform);
