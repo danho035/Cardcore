@@ -10,8 +10,7 @@ public class TileInfoGenerator : MonoBehaviour
 
     void Start()
     {
-        // Start() 함수가 호출되고 나서 0.0001초 후에 GenerateTileInfo() 함수를 호출하도록 만듭니다.
-        Invoke("GenerateTileInfo", 0.0001f);
+        Invoke("GenerateTileInfo", 0.001f);
     }
 
     void GenerateTileInfo()
@@ -23,17 +22,9 @@ public class TileInfoGenerator : MonoBehaviour
         }
 
         int columns = gridLayoutGroup.constraintCount; // 열 수
-        int rows = gridLayoutGroup.transform.childCount / columns; // 행 수
 
         // 간격 정보 가져오기
         float spacing = gridLayoutGroup.spacing.x;
-
-        // 셀 사이즈 가져오기
-        Vector2 cellSize = gridLayoutGroup.cellSize;
-        float cellWidth = cellSize.x;
-        float cellHeight = cellSize.y;
-
-        RectTransform gridRectTransform = gridLayoutGroup.GetComponent<RectTransform>();
 
         for (int i = 0; i < gridLayoutGroup.transform.childCount; i++)
         {
@@ -48,10 +39,6 @@ public class TileInfoGenerator : MonoBehaviour
             // 타일의 anchoredPosition을 사용하여 실제 위치 가져오기
             tileInfo.posX = tileRectTransform.anchoredPosition.x;
             tileInfo.posY = tileRectTransform.anchoredPosition.y;
-
-            tileInfo.width = cellWidth;
-            tileInfo.height = cellHeight;
-            tileInfo.spacing = spacing;
 
             tileInfos.Add(tileInfo); // 리스트에 타일 정보 추가
         }
@@ -72,18 +59,14 @@ public class TileInfoGenerator : MonoBehaviour
         public int column;
         public float posX;
         public float posY;
-        public float width;
-        public float height;
-        public float spacing;
 
         public override string ToString()
         {
-            return "이름: " + tileName + ", 행: " + row + ", 열: " + column + ", Pos X: " + posX + ", Pos Y: " + posY
-                + ", Width: " + width + ", Height: " + height + ", Spacing: " + spacing;
+            return "이름: " + tileName + ", 행: " + row + ", 열: " + column + ", Pos X: " + posX + ", Pos Y: " + posY;
         }
     }
 
-    // 타일 정보 리스트를 반환하는 메서드
+    // 다른 클래스에서 타일 정보에 접근할 수 있도록 public 메서드 추가
     public List<TileInfo> GetTileInfos()
     {
         return tileInfos;

@@ -219,6 +219,7 @@ GameObject:
   - component: {fileID: 269405105}
   - component: {fileID: 269405104}
   - component: {fileID: 269405106}
+  - component: {fileID: 269405107}
   m_Layer: 5
   m_Name: UnitSpawner
   m_TagString: Untagged
@@ -295,16 +296,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 269405102}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9a03e21d77794b45a8a21e63672cea7, type: 3}
+  m_Script: {fileID: 11500000, guid: 34afa00354ee9a742a8e309e853d6dfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileInfoGenerator: {fileID: 1854590796}
-  Monster11Count: 3
-  Monster21Count: 1
-  Monster31Count: 1
-  monster31Prefab: {fileID: 658088664}
-  monster21Prefab: {fileID: 793858960}
-  monster11Prefab: {fileID: 1828788061}
+  spawnParent: {fileID: 269405103}
+  bossPrefab: {fileID: 658088664}
+  middlePrefab: {fileID: 793858960}
+  normalPrefab: {fileID: 1828788061}
+  bossCount: 3
+  middleCount: 3
+  normalCount: 3
+  playerCount: 0
+--- !u!114 &269405107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269405102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7261aa9500504b3439a99b24ec143874, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &401388429
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,7 +622,7 @@ GameObject:
   - component: {fileID: 658088666}
   - component: {fileID: 658088670}
   m_Layer: 5
-  m_Name: Monster_31
+  m_Name: Boss_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -623,7 +637,7 @@ RectTransform:
   m_GameObject: {fileID: 658088664}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 269405103}
@@ -787,7 +801,7 @@ GameObject:
   - component: {fileID: 793858962}
   - component: {fileID: 793858966}
   m_Layer: 5
-  m_Name: Monster_21
+  m_Name: Middle_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -802,7 +816,7 @@ RectTransform:
   m_GameObject: {fileID: 793858960}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 269405103}
@@ -2106,7 +2120,7 @@ GameObject:
   - component: {fileID: 1828788063}
   - component: {fileID: 1828788067}
   m_Layer: 5
-  m_Name: Monster_11
+  m_Name: Normal_Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
