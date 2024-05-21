@@ -2,9 +2,13 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
+using static TileInfoGenerator;
 
 public class MonsterSpawner : MonoBehaviour
 {
+    // 싱글톤 인스턴스
+    public static MonsterSpawner Instance { get; private set; }
+
     protected List<TileInfoGenerator.TileInfo> tileInfos;
 
     public int MonsterCount { get; set; }
@@ -12,9 +16,21 @@ public class MonsterSpawner : MonoBehaviour
     protected int bossMonsterCount = 0;
     protected int middleMonsterCount = 0;
 
-
     // 몬스터 타입 상수
     public int MonsterType { get; private set; }
+
+    // Awake 메서드에서 싱글톤 인스턴스 설정
+    protected virtual void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+
+        }
+    }
 
     public void SetTileInfos(List<TileInfoGenerator.TileInfo> tileInfos)
     {
@@ -32,10 +48,37 @@ public class MonsterSpawner : MonoBehaviour
 
         Debug.LogWarning("기본 MonsterSpawner의 SpawnMonster()가 호출되었습니다. 파생된 클래스에서 이 메서드를 오버라이드하세요");
     }
+
+    // 보스 몬스터 카운터 증가 메서드
+    public void IncreaseBossMonsterCount()
+    {
+        bossMonsterCount++;
+    }
+
+    // 미들 몬스터 카운터 증가 메서드
+    public void IncreaseMiddleMonsterCount()
+    {
+        middleMonsterCount++;
+    }
+
+    public int GetBossMonsterCount()
+    {
+        return bossMonsterCount;
+    }
+
+    public int GetMiddleMonsterCount()
+    {
+        return middleMonsterCount;
+    }
 }
 
 public class Boss : MonsterSpawner
 {
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     public override void SpawnMonster(GameObject prefab, Transform spawnParent)
     {
         base.SpawnMonster(prefab, spawnParent);
@@ -88,21 +131,18 @@ public class Boss : MonsterSpawner
             Debug.LogWarning("보스 몬스터의 Image 컴포넌트를 찾을 수 없습니다.");
         }
 
-        IncreaseBossMonsterCount();
+        MonsterSpawner.Instance.IncreaseBossMonsterCount();
         Debug.Log("보스 몬스터를 스폰했습니다.");
-    }
-
-    // 보스 몬스터 카운터 증가 메서드
-    protected void IncreaseBossMonsterCount()
-    {
-        bossMonsterCount++;
-        Debug.Log("보스 카운트 업");
-        Debug.Log("보스 카운트: " + bossMonsterCount);
     }
 }
 
 public class Middle : MonsterSpawner
 {
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     public override void SpawnMonster(GameObject prefab, Transform spawnParent)
     {
         base.SpawnMonster(prefab, spawnParent);
@@ -156,33 +196,38 @@ public class Middle : MonsterSpawner
             Debug.LogWarning("미들 보스 몬스터의 Image 컴포넌트를 찾을 수 없습니다.");
         }
 
-        IncreaseMiddleMonsterCount();
+        MonsterSpawner.Instance.IncreaseMiddleMonsterCount();
         Debug.Log("미들 보스 몬스터를 스폰했습니다.");
     }
-
-    // 미들 보스 몬스터 카운터 증가 메서드
-    protected void IncreaseMiddleMonsterCount()
-    {
-        middleMonsterCount++;
-        Debug.Log("미들보스 카운트 업");
-        Debug.Log("미들보스 카운트: " + middleMonsterCount);
-    }
-
 }
 
 public class Normal : MonsterSpawner
 {
     // 중복 스폰 체크를 위한 리스트
-    private List<int> spawnedIndices = new List<int>();
     private List<GameObject> spawnedMonsters = new List<GameObject>();
+    private TileInfoGenerator tileInfoGenerator;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        tileInfoGenerator = FindObjectOfType<TileInfoGenerator>(); // TileInfoGenerator 객체 참조
+    }
 
     public override void SpawnMonster(GameObject prefab, Transform spawnParent)
     {
         base.SpawnMonster(prefab, spawnParent);
 
+        if (tileInfoGenerator == null)
+        {
+            Debug.LogWarning("TileInfoGenerator를 찾을 수 없습니다.");
+            return;
+        }
+
+        List<TileInfo> tileList = tileInfoGenerator.GetTileInfos(); // tileList 가져오기
+
         // 타일 인포의 행과 열을 가져옵니다.
-        int maxRow = tileInfos.Max(t => t.row);
-        int maxColumn = tileInfos.Max(t => t.column);
+        int maxRow = tileList.Max(t => t.row);
+        int maxColumn = tileList.Max(t => t.column);
 
         // 몬스터 카운터가 있는지 확인
         if (MonsterCount <= 0)
@@ -192,69 +237,59 @@ public class Normal : MonsterSpawner
         }
 
         // 스폰 위치를 지정하는 리스트 초기화
-        spawnedIndices.Clear();
+        List<int> spawnedIndices = new List<int>();
+
+        // 싱글톤 인스턴스를 통해 보스와 미들 보스 카운트 가져오기
+        int bossCount = MonsterSpawner.Instance.GetBossMonsterCount();
+        int middleCount = MonsterSpawner.Instance.GetMiddleMonsterCount();
 
         // 보스스폰, 미들스폰이 전부 0일 경우
-        if (bossMonsterCount == 0 && middleMonsterCount == 0)
+        if (bossCount == 0 && middleCount == 0)
         {
             Debug.Log("보스 미들보스 없음");
-            SpawnMonsterWithRule(maxRow, maxColumn, false, prefab, spawnParent);
+            SpawnMonsterWithRule(maxRow, maxColumn, false, prefab, spawnParent, spawnedIndices, tileList);
         }
-        else if (bossMonsterCount > 0 || middleMonsterCount > 0) // 보스스폰, 미들스폰이 둘 중 하나라도 1일 경우
+        else
         {
             Debug.Log("보스 미들보스 있음");
-            SpawnMonsterWithRule(maxRow, maxColumn, true, prefab, spawnParent);
+            SpawnMonsterWithRule(maxRow, maxColumn, true, prefab, spawnParent, spawnedIndices, tileList);
         }
     }
 
     // 스폰 규칙에 따라 몬스터 스폰하는 메서드
-    private void SpawnMonsterWithRule(int maxRow, int maxColumn, bool bossOrMiddleSpawned, GameObject prefab, Transform spawnParent)
+    private void SpawnMonsterWithRule(int maxRow, int maxColumn, bool bossOrMiddleSpawned, GameObject prefab, Transform spawnParent, List<int> spawnedIndices, List<TileInfo> tileList)
     {
-        // 중복 스폰 체크를 위한 리스트 초기화
-        spawnedIndices.Clear();
-        spawnedMonsters.Clear();
-
-        // 몬스터 스폰
+        // 타일 인포 리스트에서 랜덤하게 타일을 선택하고 중복을 피하며 스폰
         for (int i = 0; i < MonsterCount; i++)
         {
+            int randomIndex;
             int randomRow;
             int randomColumn;
 
-            // 임의의 행과 열 선택
-            if (!bossOrMiddleSpawned)
+            // 타일 인포 리스트에서 랜덤하게 타일 선택
+            do
             {
-                randomRow = Random.Range(0, maxRow);
-                randomColumn = Random.Range(0, maxColumn);
-            }
-            else
-            {
-                randomRow = Random.Range(1, maxRow);
-                randomColumn = Random.Range(0, maxColumn);
-            }
-
-            // 타일 인포 인덱스 번호 계산
-            int index = randomRow * maxColumn + randomColumn;
-
-            // 중복 스폰 체크
-            while (spawnedIndices.Contains(index))
-            {
-                // 다시 랜덤한 위치 선택
                 if (!bossOrMiddleSpawned)
                 {
-                    randomRow = Random.Range(0, maxRow);
+                    randomRow = Random.Range(0, maxRow + 1);
                     randomColumn = Random.Range(0, maxColumn);
+                    Debug.Log("(생성된 난수 - 보스몬스터 존재하지 않음)" + "열: " + randomColumn  + "행: " + randomRow);
                 }
                 else
                 {
-                    randomRow = Random.Range(1, maxRow);
-                    randomColumn = Random.Range(0, maxColumn);
+                    // 보스 미들보스가 있을 경우 가장 마지막 열 값을 가진 타일을 제외하고 랜덤한 타일 선택
+                    randomRow = Random.Range(0, maxRow + 1);
+                    randomColumn = Random.Range(1, maxColumn); // 가장 마지막 열 값을 가진 타일을 제외
+                    Debug.Log("(생성된 난수 - 보스몬스터 존재)" + "열: " + randomColumn + "행: " + randomRow);
                 }
 
-                index = randomRow * maxColumn + randomColumn;
-            }
+                // 선택된 행과 열에 해당하는 타일의 인덱스 찾기
+                randomIndex = FindIndexByRowAndColumn(randomRow, randomColumn, tileList);
+
+            } while (spawnedIndices.Contains(randomIndex));
 
             // 중복 스폰 체크 리스트에 추가
-            spawnedIndices.Add(index);
+            spawnedIndices.Add(randomIndex);
 
             // 부모 오브젝트를 변경한 후 몬스터를 스폰
             GameObject normalMonster = Instantiate(prefab, spawnParent);
@@ -269,9 +304,11 @@ public class Normal : MonsterSpawner
             RectTransform rectTransform = normalMonster.GetComponent<RectTransform>();
             if (rectTransform != null)
             {
-                rectTransform.anchoredPosition = new Vector2(tileInfos[index].posX, tileInfos[index].posY);
+                // 인덱스를 사용하여 타일 인포의 위치 정보를 가져옴
+                TileInfo tileInfo = tileList[randomIndex];
+                rectTransform.anchoredPosition = new Vector2(tileInfo.posX, tileInfo.posY);
                 // 사이즈 설정
-                rectTransform.sizeDelta = new Vector2(tileInfos[0].tileSize.x, tileInfos[0].tileSize.y);
+                rectTransform.sizeDelta = new Vector2(tileInfo.tileSize.x, tileInfo.tileSize.y);
             }
             else
             {
@@ -298,5 +335,20 @@ public class Normal : MonsterSpawner
         bossMonsterCount = 0;
         middleMonsterCount = 0;
         Debug.Log("노말 몬스터를 모두 스폰했습니다. 카운터 초기화");
+    }
+
+    // 리스트에서 특정 행과 열 값과 일치하는 요소의 인덱스를 찾는 함수
+    public int FindIndexByRowAndColumn(int row, int column, List<TileInfo> tileList)
+    {
+        for (int i = 0; i < tileList.Count; i++)
+        {
+            // 행과 열을 반대로 비교합니다.
+            if (tileList[i].row == row && tileList[i].column == column)
+            {
+                return i; // 일치하는 요소의 인덱스 반환
+            }
+        }
+
+        return -1; // 일치하는 요소가 없을 경우 -1 반환
     }
 }
