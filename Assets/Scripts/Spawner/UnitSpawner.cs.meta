@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7261aa9500504b3439a99b24ec143874
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - bossPrefab: {instanceID: 0}
+  - middlePrefab: {instanceID: 0}
+  - normalPrefab: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

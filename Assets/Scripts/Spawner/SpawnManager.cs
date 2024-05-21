@@ -22,6 +22,7 @@ public class SpawnManager : MonoBehaviour
     public GameObject bossPrefab;
     public GameObject middlePrefab;
     public GameObject normalPrefab;
+    public GameObject playerPrefab;
 
     // 스폰에 필요한 소환 카운트
     public int bossCount;
@@ -54,16 +55,21 @@ public class SpawnManager : MonoBehaviour
         Boss bossSpawner = spawnParent.gameObject.AddComponent<Boss>();
         bossSpawner.MonsterCount = bossCount;
         bossSpawner.SetTileInfos(tileInfos);
-        bossSpawner.SpawnMonster(bossPrefab, spawnParentTransform);
+        bossSpawner.Spawning(bossPrefab, spawnParentTransform);
 
         Middle middleSpawner = spawnParent.gameObject.AddComponent<Middle>();
         middleSpawner.MonsterCount = middleCount;
         middleSpawner.SetTileInfos(tileInfos);
-        middleSpawner.SpawnMonster(middlePrefab, spawnParentTransform);
+        middleSpawner.Spawning(middlePrefab, spawnParentTransform);
 
         Normal normalSpawner = spawnParent.gameObject.AddComponent<Normal>();
         normalSpawner.MonsterCount = normalCount;
         normalSpawner.SetTileInfos(tileInfos);
-        normalSpawner.SpawnMonster(normalPrefab, spawnParentTransform);
+        normalSpawner.Spawning(normalPrefab, spawnParentTransform);
+        
+        Player playerSpawner = spawnParent.gameObject.AddComponent<Player>();
+        playerSpawner.MonsterCount = playerCount;
+        playerSpawner.SetTileInfos(tileInfos);
+        playerSpawner.Spawning(playerPrefab, spawnParentTransform);
     }
 }

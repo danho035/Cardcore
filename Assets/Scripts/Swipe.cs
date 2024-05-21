@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SwipeDetector : MonoBehaviour
+public class Swipe : MonoBehaviour
 {
 	private Vector2 fingerDownPos;
 	private Vector2 fingerUpPos;
 
 	public bool detectSwipeAfterRelease = false;
 
-	public float SWIPE_THRESHOLD = 20f;
+	public float SWIPE_THRESHOLD = 8f;
 
 	// Update is called once per frame
 	void Update()
@@ -92,21 +92,21 @@ public class SwipeDetector : MonoBehaviour
 
 	void OnSwipeUp()
 	{
-		//Do something when swiped up
+		Debug.Log("스와이프 인식: 위");
 	}
 
 	void OnSwipeDown()
 	{
-		//Do something when swiped down
+		Debug.Log("스와이프 인식: 아래");
 	}
 
 	void OnSwipeLeft()
 	{
-		//Do something when swiped left
+		Debug.Log("스와이프 인식: 왼쪽");
 	}
 
 	void OnSwipeRight()
 	{
-		//Do something when swiped right
+		Debug.Log("스와이프 인식: 오른쪽");
 	}
 }
