@@ -13,26 +13,18 @@ public enum Result
     right,
     down,
     left,
+    click,
     none
 }
 
-public class SwipeInputManager : MonoBehaviour
+public class InputManager : MonoBehaviour
 {
-    public float SWIPE_THRESHOLD = 25f; // 스와이프 인식 범위
+    public float SwipeThreshold; // 스와이프 인식 범위
+    public Result Gesture_Result { get; private set; } = Result.none; // 제스처 결과를 프로퍼티로 변경
 
-    enum Direction // 방향 enum 설정
-    {
-        up = 1,
-        right,
-        down,
-        left
-    }
-
-    Result Gesture_Result = Result.none; // 제스처 결과
-    Vector2 StartPoint; // 시작 지점
-    Vector2 EndPoint; // 종료 지점
-    Vector2 SwipeVector; // 스와이프 벡터
-    public Camera MainCamera; // 메인 카메라
+    private Vector2 StartPoint; // 시작 지점
+    private Vector2 EndPoint; // 종료 지점
+    private Vector2 SwipeVector; // 스와이프 벡터
 
     void Update()
     {
@@ -50,9 +42,13 @@ public class SwipeInputManager : MonoBehaviour
             SwipeVector = EndPoint - StartPoint;
 
             // 스와이프 거리가 설정한 임계값보다 크면 인식
-            if (SwipeVector.magnitude > SWIPE_THRESHOLD)
+            if (SwipeVector.magnitude > SwipeThreshold)
             {
                 RecognizeSwipe();
+            }
+            else
+            {
+                Gesture_Result = Result.click; // 클릭 인식
             }
         }
 #else
@@ -69,9 +65,13 @@ public class SwipeInputManager : MonoBehaviour
             SwipeVector = EndPoint - StartPoint;
 
             // 스와이프 거리가 설정한 임계값보다 크면 인식
-            if (SwipeVector.magnitude > SWIPE_THRESHOLD)
+            if (SwipeVector.magnitude > SwipeThreshold)
             {
                 RecognizeSwipe();
+            }
+            else
+            {
+                Gesture_Result = Result.click; // 클릭 인식
             }
         }
 #endif
@@ -109,5 +109,10 @@ public class SwipeInputManager : MonoBehaviour
             Gesture_Result = Result.right;
             Debug.Log("스와이프 방향: Right");
         }
+    }
+
+    public void ResetGestureResult()
+    {
+        Gesture_Result = Result.none;
     }
 }

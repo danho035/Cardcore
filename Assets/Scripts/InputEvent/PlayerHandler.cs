@@ -1,14 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerHandler : MonoBehaviour
 {
-    public SwipeInputManager swipeInputManager; // SwipeInputManager 스크립트 참조
-    private TileInfoGenerator tileInfoGenerator; // TileInfoGenerator 스크립트 참조
+    public InputManager InputManager; // SwipeInputManager 스크립트 참조
+    public TileInfoGenerator tileInfoGenerator; // TileInfoGenerator 스크립트 참조
+    public GameObject objectToDestroy;
 
-    // 현재 플레이어가 위치한 타일 정보 확인 메서드
-    void CheckCurrentTileInfo()
+    public float duration; // 애니메이션 출력 시간
+    public float moveCooldown; // 이동 쿨다운 시간
+    private float lastMoveTime; // 마지막 이동 시간
+
+    private int playerRow;
+    private int playerColumn;
+    private bool isMoving = false; // 플레이어가 이동 중인지 체크
+    private bool coolTimeWait = false; // 쿨타임 대기
+
+    // 플레이어 위치 초기화
+    void PostionReset()
     {
         // 플레이어가 속한 타일의 정보를 가져오기 위해 박스 콜라이더2D 컴포넌트 찾기
         BoxCollider2D playerCollider = GetComponent<BoxCollider2D>();
@@ -38,9 +49,9 @@ public class PlayerHandler : MonoBehaviour
                         if (tileInfo.tileName == objectName)
                         {
                             // 가져온 타일 정보를 사용하여 행과 열의 값을 불러오기
-                            int row = tileInfo.row;
-                            int column = tileInfo.column;
-                            Debug.Log("플레이어의 위치 - 행: " + row + ", 열: " + column);
+                            playerRow = tileInfo.row;
+                            playerColumn = tileInfo.column;
+                            Debug.Log("플레이어의 위치 - 행: " + playerRow + ", 열: " + playerColumn);
                             break;
                         }
                     }
@@ -49,15 +60,231 @@ public class PlayerHandler : MonoBehaviour
         }
     }
 
+    // 플레이어 위치 업데이트
+    void UpdatePosition()
+    {
+        if (tileInfoGenerator == null)
+        {
+            Debug.LogError("TileInfoGenerator를 찾을 수 없습니다!");
+            return;
+        }
+
+        // 박스 콜라이더 2D와 접촉한 오브젝트 이름 가져오기
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position, transform.localScale, 0f);
+        foreach (Collider2D collider in colliders)
+        {
+            string objectName = collider.gameObject.name;
+            Debug.Log("접촉한 오브젝트 이름: " + objectName);
+
+            // 타일 정보 가져오기
+            List<TileInfoGenerator.TileInfo> tileInfos = tileInfoGenerator.GetTileInfos();
+            if (tileInfos != null)
+            {
+                foreach (var tileInfo in tileInfos)
+                {
+                    if (tileInfo.tileName == objectName)
+                    {
+                        // 가져온 타일 정보를 사용하여 행과 열의 값을 불러오기
+                        playerRow = tileInfo.row;
+                        playerColumn = tileInfo.column;
+
+                        Debug.Log("플레이어의 위치 - 행: " + playerRow + ", 열: " + playerColumn);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    void PlayerMove(int newRow, int newColumn)
+    {
+        if (tileInfoGenerator == null)
+        {
+            Debug.LogError("TileInfoGenerator를 찾을 수 없습니다!");
+            return;
+        }
+
+        // 이동할 타일 정보 가져오기
+        List<TileInfoGenerator.TileInfo> tileInfos = tileInfoGenerator.GetTileInfos();
+        if (tileInfos == null || tileInfos.Count == 0)
+        {
+            Debug.LogWarning("타일 정보를 가져올 수 없습니다.");
+            return;
+        }
+
+        // 이동할 타일 찾기
+        TileInfoGenerator.TileInfo targetTile = tileInfos.Find(tile => tile.row == newRow && tile.column == newColumn);
+        if (targetTile == null)
+        {
+            Debug.LogWarning("목표 타일을 찾을 수 없습니다: 행 " + newRow + ", 열 " + newColumn);
+            StartCoroutine(ShakePlayer());
+            return;
+        }
+
+        // 타일의 TileCheck 스크립트 가져오기
+        TileCheck targetTileCheck = GameObject.Find(targetTile.tileName).GetComponent<TileCheck>();
+        if (targetTileCheck == null)
+        {
+            Debug.LogError("TileCheck 스크립트를 찾을 수 없습니다: " + targetTile.tileName);
+            return;
+        }
+
+        // 플레이어 또는 적이 있는지 확인
+        if (targetTileCheck.Player || targetTileCheck.Enemy)
+        {
+            Debug.LogWarning("이동할 수 없습니다. 타일에 다른 오브젝트가 있습니다: " + targetTile.tileName);
+            StartCoroutine(ShakePlayer());
+        }
+        else if (coolTimeWait == true)
+        {
+            Debug.LogWarning("이동 쿨다운 남은시간: " + (moveCooldown - (Time.time - lastMoveTime)));
+            StartCoroutine(ShakePlayer()); // 쿨다운 중 이동 시도 시 움찔거리는 애니메이션 호출
+        }
+        else
+        {
+            // 이동 가능, 플레이어 이동
+            StartCoroutine(MovePlayer(GameObject.Find(targetTile.tileName).transform.position));
+            playerRow = newRow;
+            playerColumn = newColumn;
+        }
+    }
+
+    IEnumerator MovePlayer(Vector3 targetPosition)
+    {
+
+        lastMoveTime = Time.time + duration; // 현재 시간으로 설정
+        isMoving = true;
+        coolTimeWait = true;
+        Vector3 startingPosition = transform.position;
+        float elapsedTime = 0f; // elapsedTime 초기화
+
+        while (elapsedTime < duration)
+        {
+            transform.position = Vector3.Lerp(startingPosition, targetPosition, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = targetPosition;
+        isMoving = false;
+
+        // 이동 후 현재 타일 정보 갱신
+        UpdatePosition();
+    }
+
+    IEnumerator ShakePlayer() // 움찍거리기
+    {
+        Vector3 originalPosition = transform.position;
+        float shakeDuration = 0.15f; // 움찔거리는 애니메이션의 지속 시간
+        float shakeMagnitude = 30f; // 움찔거리는 정도
+        float elapsedTime = 0f;
+
+        while (elapsedTime < shakeDuration)
+        {
+            float xOffset = Random.Range(-shakeMagnitude, shakeMagnitude);
+            float yOffset = Random.Range(-shakeMagnitude, shakeMagnitude);
+
+            transform.position = new Vector3(originalPosition.x + xOffset, originalPosition.y + yOffset, originalPosition.z);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // 움찔거리는 애니메이션 후 원래 위치로 복원
+        transform.position = originalPosition;
+    }
+
+    IEnumerator BlinkPlayer() // 쿨타임 피드백
+    {
+        coolTimeWait = false;
+
+        Image image = gameObject.GetComponent<Image>();
+        float blinkDuration = 0.8f; // 깜빡이는 애니메이션의 지속 시간
+        float elapsedTime = 0f;
+
+        Color originalColor = new Color(image.color.r, image.color.g, image.color.b, 0.05f); // 알파값을 줄임
+        Color targetColor = new Color(image.color.r, image.color.g, image.color.b, 1f); // 알파값이 1인 수치 지정
+
+        image.color = targetColor;
+
+        while (elapsedTime < blinkDuration)
+        {
+            float t = elapsedTime / blinkDuration;
+            image.color = Color.Lerp(originalColor, targetColor, t); // 알파값 천천히 변경
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        image.color = targetColor; // 애니메이션 종료 후 원래 상태로 복원
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        CheckCurrentTileInfo();
+        string objectName = gameObject.name;
+
+        if (objectName == "Player_Unit")
+        {
+            if (InputManager == null)
+            {
+                Debug.LogError("PlayerHandler에 InputManager가 설정되지 않았습니다");
+            }
+            else if (tileInfoGenerator == null)
+            {
+                Debug.LogError("PlayerHandle에 TileInfoGenerator가 설정되지 않았습니다");
+            }
+            else
+            {
+                PostionReset();
+            }
+        }
+        else
+        {
+            Destroy(objectToDestroy, 0.2f);
+        }
+
+
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (InputManager == null)
+        {
+            Debug.LogError("SwipeInputManager를 찾을 수 없습니다 - PlayerHandler");
+            return;
+        }
 
+        if (!isMoving && InputManager.Gesture_Result != Result.none)
+        {
+            Debug.Log("현재 스와이프 결과: " + InputManager.Gesture_Result);
+            if (InputManager.Gesture_Result == Result.up) // UP
+            {
+                PlayerMove(playerRow, playerColumn - 1);
+            }
+            else if (InputManager.Gesture_Result == Result.down) // Down
+            {
+                PlayerMove(playerRow, playerColumn + 1);
+            }
+            else if (InputManager.Gesture_Result == Result.left) // Left
+            {
+                PlayerMove(playerRow - 1, playerColumn);
+            }
+            else if (InputManager.Gesture_Result == Result.right) // Right
+            {
+                PlayerMove(playerRow + 1, playerColumn);
+            }
+            else if (InputManager.Gesture_Result == Result.click)
+            {
+                Debug.Log("클릭 인식");
+            }
+
+            // 스와이프 결과를 초기화
+            InputManager.ResetGestureResult(); // 수정된 부분
+        }
+
+        // 쿨타임이 종료되었을 때 깜빡이는 애니메이션을 실행
+        if (coolTimeWait && Time.time - lastMoveTime >= moveCooldown)
+        {
+            StartCoroutine(BlinkPlayer());
+        }
     }
 }

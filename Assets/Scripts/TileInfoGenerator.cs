@@ -6,7 +6,7 @@ public class TileInfoGenerator : MonoBehaviour
 {
     public GridLayoutGroup gridLayoutGroup; // 사용자가 그리드 레이아웃 그룹을 직접 설정할 수 있도록 변수를 public으로 변경
 
-    private List<TileInfo> tileInfos = new List<TileInfo>(); // 타일 정보 리스트
+    public List<TileInfo> tileInfos = new List<TileInfo>(); // 타일 정보 리스트
 
     void Start()
     {
@@ -50,13 +50,6 @@ public class TileInfoGenerator : MonoBehaviour
 
             tileInfos.Add(tileInfo); // 리스트에 타일 정보 추가
         }
-
-        // 타일 정보 출력
-        Debug.Log("타일 정보:");
-        foreach (TileInfo info in tileInfos)
-        {
-            Debug.Log(info.ToString());
-        }
     }
 
     // 타일 정보를 담는 클래스
@@ -67,8 +60,8 @@ public class TileInfoGenerator : MonoBehaviour
         public int column;
         public float posX;
         public float posY;
-        public Vector2 tileSize; // 타일 크기
-        public float spacing; // 간격
+        public Vector2 tileSize; 
+        public float spacing;
 
         public override string ToString()
         {
