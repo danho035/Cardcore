@@ -151,20 +151,36 @@ public class PlayerHandler : MonoBehaviour
 
     IEnumerator MovePlayer(Vector3 targetPosition)
     {
-
-        lastMoveTime = Time.time + duration; // 현재 시간으로 설정
+        float preparationDistance = 15f; // 준비 단계에서 반대 방향으로 이동하는 거리 조정
+        lastMoveTime = Time.time + duration;
         isMoving = true;
         coolTimeWait = true;
-        Vector3 startingPosition = transform.position;
-        float elapsedTime = 0f; // elapsedTime 초기화
 
-        while (elapsedTime < duration)
+        Vector3 startingPosition = transform.position;
+        float elapsedTime = 0f;
+
+        // 준비 위치를 계산 (타겟 위치의 반대 방향으로 일정 거리만큼 이동)
+        Vector3 directionToTarget = (targetPosition - startingPosition).normalized;
+        Vector3 preparationPosition = startingPosition - directionToTarget * preparationDistance; // 반대 방향으로 preparationDistance 만큼 이동
+
+        // 준비 단계 (전체 duration의 75%)
+        while (elapsedTime < duration * 0.75f)
         {
-            transform.position = Vector3.Lerp(startingPosition, targetPosition, elapsedTime / duration);
+            transform.position = Vector3.Lerp(startingPosition, preparationPosition, elapsedTime / (duration * 0.75f));
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
+        // 빠른 이동 단계 (전체 duration의 25%)
+        float fastMoveStartTime = elapsedTime;
+        while (elapsedTime < duration)
+        {
+            transform.position = Vector3.Lerp(preparationPosition, targetPosition, (elapsedTime - fastMoveStartTime) / (duration * 0.25f));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // 최종 위치를 정확히 타겟 위치로 설정
         transform.position = targetPosition;
         isMoving = false;
 

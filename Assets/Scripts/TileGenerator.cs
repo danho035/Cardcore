@@ -11,7 +11,7 @@ public class TileGenerator : MonoBehaviour
     float screenWidth; // 화면 너비
     float screenHeight; // 화면 높이
 
-    void GenerateTiles() // 타일 생성
+    public void GenerateTiles() // 타일 생성
     {
         GameObject firstTile = null; // 첫 번째 타일을 저장할 변수
 
@@ -95,7 +95,7 @@ public class TileGenerator : MonoBehaviour
         screenWidth = Screen.width;
         screenHeight = Screen.height;
 
+        // 행과 열의 개수를 전달하여 GenerateTiles 메서드를 호출합니다.
         TilesSize();
-
     }
 }

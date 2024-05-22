@@ -6,10 +6,17 @@ public class SpawnManager : MonoBehaviour
     // 유닛 타입 상수
     public static class UnitType
     {
-        public const int Boss = 1;
+        public const int Normal = 1;
         public const int Middle = 2;
-        public const int Normal = 3;
+        public const int Boss = 3;
         public const int Player = 4;
+    }
+
+    // 유닛을 스폰하는 메서드
+    public void SpawnUnit(string unitName, int unitType)
+    {
+        // 유닛을 스폰하는 로직을 구현합니다.
+        Debug.Log("Spawning unit: " + unitName + ", Type: " + unitType);
     }
 
     // 스폰 위치를 지정할 부모 오브젝트
