@@ -12,13 +12,6 @@ public class SpawnManager : MonoBehaviour
         public const int Player = 4;
     }
 
-    // 유닛을 스폰하는 메서드
-    public void SpawnUnit(string unitName, int unitType)
-    {
-        // 유닛을 스폰하는 로직을 구현합니다.
-        Debug.Log("Spawning unit: " + unitName + ", Type: " + unitType);
-    }
-
     // 스폰 위치를 지정할 부모 오브젝트
     public Transform spawnParent;
 

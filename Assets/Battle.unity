@@ -369,6 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7261aa9500504b3439a99b24ec143874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  battleGenerator: {fileID: 42290582}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -757,12 +758,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426249a274484aa4fbaade8d43316efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitName: 
-  unitType: 0
-  attackPower: 0
-  defensePower: 0
-  speed: 0
-  healthPoints: 0
+  Name: 
+  Type: 0
+  SpawnArea: 0
+  Level: 0
+  HP: 1
+  Atk: 0
+  Def: 0
+  Shield: 0
+  CritChance: 0
+  AtkSpeed: 0
 --- !u!1 &680557750
 GameObject:
   m_ObjectHideFlags: 0
@@ -987,12 +992,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426249a274484aa4fbaade8d43316efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitName: 
-  unitType: 0
-  attackPower: 0
-  defensePower: 0
-  speed: 0
-  healthPoints: 0
+  Name: 
+  Type: 0
+  SpawnArea: 0
+  Level: 0
+  HP: 1
+  Atk: 0
+  Def: 0
+  Shield: 0
+  CritChance: 0
+  AtkSpeed: 0
 --- !u!1 &1054786577
 GameObject:
   m_ObjectHideFlags: 0
@@ -2004,12 +2013,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426249a274484aa4fbaade8d43316efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitName: 
-  unitType: 0
-  attackPower: 0
-  defensePower: 0
-  speed: 0
-  healthPoints: 0
+  Name: 
+  Type: 0
+  SpawnArea: 0
+  Level: 0
+  HP: 1
+  Atk: 0
+  Def: 0
+  Shield: 0
+  CritChance: 0
+  AtkSpeed: 0
 --- !u!1 &1854590790
 GameObject:
   m_ObjectHideFlags: 0
@@ -2410,7 +2423,6 @@ MonoBehaviour:
   tileInfoGenerator: {fileID: 1854590796}
   objectToDestroy: {fileID: 1919273640}
   duration: 0.5
-  moveCooldown: 0.1
 --- !u!114 &1919273648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2423,12 +2435,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 426249a274484aa4fbaade8d43316efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitName: 
-  unitType: 0
-  attackPower: 0
-  defensePower: 0
-  speed: 0
-  healthPoints: 0
+  Name: 
+  Type: 0
+  SpawnArea: 0
+  Level: 0
+  HP: 1
+  Atk: 0
+  Def: 0
+  Shield: 0
+  CritChance: 0
+  AtkSpeed: 0
 --- !u!1 &1986675246
 GameObject:
   m_ObjectHideFlags: 0

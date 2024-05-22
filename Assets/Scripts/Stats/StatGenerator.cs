@@ -22,7 +22,7 @@ public class StatGenerator : MonoBehaviour
         statManager.AddMonsterStats("Robber", robberStats);
         statManager.AddMonsterStats("Boar", boarStats);
         statManager.AddMonsterStats("King Slime", kingSlimeStats);
-        statManager.AddMonsterStats("King Slime", Dragon);
+        statManager.AddMonsterStats("Dragon", Dragon);
 
         // 특정 몬스터의 스탯 가져오기 예시
         UnitStats goblinStatsRetrieved = statManager.GetMonsterStats("Goblin");

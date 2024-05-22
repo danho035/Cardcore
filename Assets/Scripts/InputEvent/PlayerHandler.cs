@@ -10,13 +10,10 @@ public class PlayerHandler : MonoBehaviour
     public GameObject objectToDestroy;
 
     public float duration; // 애니메이션 출력 시간
-    public float moveCooldown; // 이동 쿨다운 시간
-    private float lastMoveTime; // 마지막 이동 시간
 
     private int playerRow;
     private int playerColumn;
     private bool isMoving = false; // 플레이어가 이동 중인지 체크
-    private bool coolTimeWait = false; // 쿨타임 대기
 
     // 플레이어 위치 초기화
     void PostionReset()
@@ -135,11 +132,6 @@ public class PlayerHandler : MonoBehaviour
             Debug.LogWarning("이동할 수 없습니다. 타일에 다른 오브젝트가 있습니다: " + targetTile.tileName);
             StartCoroutine(ShakePlayer());
         }
-        else if (coolTimeWait == true)
-        {
-            Debug.LogWarning("이동 쿨다운 남은시간: " + (moveCooldown - (Time.time - lastMoveTime)));
-            StartCoroutine(ShakePlayer()); // 쿨다운 중 이동 시도 시 움찔거리는 애니메이션 호출
-        }
         else
         {
             // 이동 가능, 플레이어 이동
@@ -152,9 +144,7 @@ public class PlayerHandler : MonoBehaviour
     IEnumerator MovePlayer(Vector3 targetPosition)
     {
         float preparationDistance = 15f; // 준비 단계에서 반대 방향으로 이동하는 거리 조정
-        lastMoveTime = Time.time + duration;
         isMoving = true;
-        coolTimeWait = true;
 
         Vector3 startingPosition = transform.position;
         float elapsedTime = 0f;
@@ -192,7 +182,7 @@ public class PlayerHandler : MonoBehaviour
     {
         Vector3 originalPosition = transform.position;
         float shakeDuration = 0.15f; // 움찔거리는 애니메이션의 지속 시간
-        float shakeMagnitude = 30f; // 움찔거리는 정도
+        float shakeMagnitude = 15f; // 움찔거리는 정도
         float elapsedTime = 0f;
 
         while (elapsedTime < shakeDuration)
@@ -207,30 +197,6 @@ public class PlayerHandler : MonoBehaviour
 
         // 움찔거리는 애니메이션 후 원래 위치로 복원
         transform.position = originalPosition;
-    }
-
-    IEnumerator BlinkPlayer() // 쿨타임 피드백
-    {
-        coolTimeWait = false;
-
-        Image image = gameObject.GetComponent<Image>();
-        float blinkDuration = 0.8f; // 깜빡이는 애니메이션의 지속 시간
-        float elapsedTime = 0f;
-
-        Color originalColor = new Color(image.color.r, image.color.g, image.color.b, 0.05f); // 알파값을 줄임
-        Color targetColor = new Color(image.color.r, image.color.g, image.color.b, 1f); // 알파값이 1인 수치 지정
-
-        image.color = targetColor;
-
-        while (elapsedTime < blinkDuration)
-        {
-            float t = elapsedTime / blinkDuration;
-            image.color = Color.Lerp(originalColor, targetColor, t); // 알파값 천천히 변경
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        image.color = targetColor; // 애니메이션 종료 후 원래 상태로 복원
     }
 
     // Start is called before the first frame update
@@ -257,8 +223,6 @@ public class PlayerHandler : MonoBehaviour
         {
             Destroy(objectToDestroy, 0.2f);
         }
-
-
     }
 
     void Update()
@@ -294,13 +258,7 @@ public class PlayerHandler : MonoBehaviour
             }
 
             // 스와이프 결과를 초기화
-            InputManager.ResetGestureResult(); // 수정된 부분
-        }
-
-        // 쿨타임이 종료되었을 때 깜빡이는 애니메이션을 실행
-        if (coolTimeWait && Time.time - lastMoveTime >= moveCooldown)
-        {
-            StartCoroutine(BlinkPlayer());
+            InputManager.ResetGestureResult();
         }
     }
 }
