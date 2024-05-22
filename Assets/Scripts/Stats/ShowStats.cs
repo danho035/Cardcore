@@ -31,9 +31,12 @@ public class ShowStats : MonoBehaviour
 
     // 공격 속도
     public float AtkSpeed;
+    
+    // 공격 속도
+    public float MoveSpeed;
 
     // 유닛의 스탯을 설정하는 함수
-    public void SetStats(string name, int type, int spawnArea, int level, int hp, int atk, int def, int shield, float critChance, float atkSpeed)
+    public void SetStats(string name, int type, int spawnArea, int level, int hp, int atk, int def, int shield, float critChance, float atkSpeed, float moveSpeed)
     {
         Name = name;
         Type = type;
@@ -45,6 +48,32 @@ public class ShowStats : MonoBehaviour
         Shield = shield;
         CritChance = critChance;
         AtkSpeed = atkSpeed;
+        MoveSpeed = moveSpeed;
+    }
+
+    void ApplyMoveSpeedToPlayerHandler()
+    {
+        if (gameObject.name.StartsWith("Player_"))
+        {
+            PlayerHandler playerHandler = gameObject.GetComponent<PlayerHandler>();
+            if (playerHandler != null && MoveSpeed > 0)
+            {
+                playerHandler.duration = MoveSpeed;
+            }
+            else if (playerHandler == null)
+            {
+                Debug.LogError("Player 오브젝트에서 PlayerHandler를 찾을 수 없습니다.");
+            }
+            else
+            {
+                Debug.LogError("지정된 MoveSpeed가 0입니다.");
+            }
+        }
+    }
+
+    void Start()
+    {
+        Invoke("ApplyMoveSpeedToPlayerHandler", 0.15f);
     }
 
     void Update()

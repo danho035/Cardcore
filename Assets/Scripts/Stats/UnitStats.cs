@@ -11,9 +11,10 @@ public class UnitStats
     public int Shield { get; set; }
     public float CritChance { get; set; }
     public float AtkSpeed { get; set; }
+    public float MoveSpeed { get; set; }
 
     // »ý¼ºÀÚ
-    public UnitStats(string name, int type, int spawnArea, int level, int hp, int atk, int def, int shield, float critChance, float atkSpeed)
+    public UnitStats(string name, int type, int spawnArea, int level, int hp, int atk, int def, int shield, float critChance, float atkSpeed, float moveSpeed)
     {
         Name = name;
         Type = type;
@@ -25,5 +26,6 @@ public class UnitStats
         Shield = shield;
         CritChance = critChance;
         AtkSpeed = atkSpeed;
+        MoveSpeed = moveSpeed;
     }
 }

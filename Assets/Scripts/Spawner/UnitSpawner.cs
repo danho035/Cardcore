@@ -471,8 +471,22 @@ public class Player : UnitSpawner
 
         List<TileInfo> tileList = tileInfoGenerator.GetTileInfos();
 
-        // 타일 정보가 없는 경우 기본 메서드에서 종료됨
-        if (tileInfos == null || tileInfos.Count == 0) return;
+        if (tileList == null || tileList.Count == 0) return;
+
+        Dictionary<string, UnitStats> playerSelected = BattleGenerator.BattleInstance?.PlayerSelected;
+        if (playerSelected != null && playerSelected.Count > 0)
+        {
+            Debug.Log("플레이어 정보가 로드되었습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("플레이어 정보가 없습니다.");
+            return;
+        }
+
+        List<string> keys = new List<string>(playerSelected.Keys);
+        int renKey = Random.Range(0, keys.Count);
+        string Key = keys[renKey];
 
         int randomIndex;
         float maxRow = tileList.Max(t => t.row);
@@ -482,25 +496,50 @@ public class Player : UnitSpawner
         if (maxRow == 3)
         {
             int randomValue = Random.Range(0, 2);
-
             middleRow = middleRow - randomValue;
         }
 
         randomIndex = FindIndexByRowAndColumn(middleRow, maxColumn, tileList);
 
-
         GameObject PlayerUnit = Instantiate(prefab, spawnParent);
-        RectTransform rectTransform = PlayerUnit.GetComponent<RectTransform>();
-        BoxCollider2D boxCollider2D = PlayerUnit.GetComponent<BoxCollider2D>();
-
         PlayerUnit.name = "Player_Unit";
 
+        ShowStats showStats = PlayerUnit.GetComponent<ShowStats>();
+
+        if (showStats != null)
+        {
+            if (playerSelected.ContainsKey(Key))
+            {
+                UnitStats unitStats = playerSelected[Key];
+                showStats.Name = unitStats.Name;
+                showStats.Type = unitStats.Type;
+                showStats.SpawnArea = unitStats.SpawnArea;
+                showStats.Level = unitStats.Level;
+                showStats.HP = unitStats.HP;
+                showStats.Atk = unitStats.Atk;
+                showStats.Def = unitStats.Def;
+                showStats.Shield = unitStats.Shield;
+                showStats.CritChance = unitStats.CritChance;
+                showStats.AtkSpeed = unitStats.AtkSpeed;
+                showStats.MoveSpeed = unitStats.MoveSpeed;
+            }
+            else
+            {
+                Debug.LogError("Key not found in dictionary: " + Key);
+                return;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("ShowStats component not found in the instantiated prefab.");
+            return;
+        }
+
+        RectTransform rectTransform = PlayerUnit.GetComponent<RectTransform>();
         if (rectTransform != null)
         {
-            // 인덱스를 사용하여 타일 인포의 위치 정보를 가져옴
             TileInfo tileInfo = tileList[randomIndex];
             rectTransform.anchoredPosition = new Vector2(tileInfo.posX, tileInfo.posY);
-            // 사이즈 설정
             rectTransform.sizeDelta = new Vector2(tileInfo.tileSize.x, tileInfo.tileSize.y);
         }
         else
@@ -508,16 +547,16 @@ public class Player : UnitSpawner
             Debug.LogWarning("플레이어 유닛의 RectTransform 컴포넌트를 찾을 수 없습니다.");
         }
 
+        BoxCollider2D boxCollider2D = PlayerUnit.GetComponent<BoxCollider2D>();
         if (boxCollider2D != null)
         {
-            boxCollider2D.size = new Vector2(tileInfos[0].tileSize.x, tileInfos[0].tileSize.y);
+            boxCollider2D.size = new Vector2(tileList[0].tileSize.x, tileList[0].tileSize.y);
         }
         else
         {
             Debug.LogWarning("플레이어 유닛의 BoxCollider2D 컴포넌트를 찾을 수 없습니다.");
         }
 
-        // 플레이어 유닛의 이미지 컴포넌트를 가져와 투명도를 설정
         Image image = PlayerUnit.GetComponent<Image>();
         if (image != null)
         {
@@ -537,13 +576,12 @@ public class Player : UnitSpawner
     {
         for (int i = 0; i < tileList.Count; i++)
         {
-            // 행과 열을 반대로 비교합니다.
             if (tileList[i].row == row && tileList[i].column == column)
             {
-                return i; // 일치하는 요소의 인덱스 반환
+                return i;
             }
         }
-
-        return -1; // 일치하는 요소가 없을 경우 -1 반환
+        return -1;
     }
 }
+
