@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShowStats : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public class ShowStats : MonoBehaviour
 
     // 공격 속도
     public float AtkSpeed;
-    
+
     // 공격 속도
     public float MoveSpeed;
 
@@ -71,9 +72,12 @@ public class ShowStats : MonoBehaviour
         }
     }
 
+    public SpriteRenderer image;
+
     void Start()
     {
         Invoke("ApplyMoveSpeedToPlayerHandler", 0.15f);
+
     }
 
     void Update()

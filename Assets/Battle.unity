@@ -594,6 +594,7 @@ GameObject:
   - component: {fileID: 658088667}
   - component: {fileID: 658088670}
   - component: {fileID: 658088671}
+  - component: {fileID: 658088672}
   m_Layer: 5
   m_Name: Boss_Prefab
   m_TagString: Untagged
@@ -770,6 +771,20 @@ MonoBehaviour:
   CritChance: 0
   AtkSpeed: 0
   MoveSpeed: 0
+  image: {fileID: 0}
+--- !u!114 &658088672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 658088664}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1fe6f6e17590544b102f7f72e5f1bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileInfoGenerator: {fileID: 1854590796}
 --- !u!1 &680557750
 GameObject:
   m_ObjectHideFlags: 0
@@ -829,6 +844,7 @@ GameObject:
   - component: {fileID: 793858963}
   - component: {fileID: 793858966}
   - component: {fileID: 793858967}
+  - component: {fileID: 793858968}
   m_Layer: 5
   m_Name: Middle_Prefab
   m_TagString: Untagged
@@ -1005,6 +1021,20 @@ MonoBehaviour:
   CritChance: 0
   AtkSpeed: 0
   MoveSpeed: 0
+  image: {fileID: 0}
+--- !u!114 &793858968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793858960}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1fe6f6e17590544b102f7f72e5f1bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileInfoGenerator: {fileID: 1854590796}
 --- !u!1 &1054786577
 GameObject:
   m_ObjectHideFlags: 0
@@ -1220,6 +1250,7 @@ GameObject:
   - component: {fileID: 1521923853}
   - component: {fileID: 1521923852}
   - component: {fileID: 1521923851}
+  - component: {fileID: 1521923854}
   m_Layer: 0
   m_Name: Stat Generator
   m_TagString: Untagged
@@ -1267,6 +1298,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1521923854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1521923849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14c0d780a2ff248468d9dade30ee3fd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileInfoGenerator: {fileID: 1854590796}
+  unitRow: 3
+  unitColumn: 2
+  meleeTargetTileCount: 0
+  rangeTargetTileCount: 0
+  duration: 0
+  meleeChance: 0
+  rangeChance: 0
+  atkCount: 0
 --- !u!1 &1524942926
 GameObject:
   m_ObjectHideFlags: 0
@@ -1851,6 +1903,7 @@ GameObject:
   - component: {fileID: 1828788064}
   - component: {fileID: 1828788067}
   - component: {fileID: 1828788068}
+  - component: {fileID: 1828788069}
   m_Layer: 5
   m_Name: Normal_Prefab
   m_TagString: Untagged
@@ -2027,6 +2080,20 @@ MonoBehaviour:
   CritChance: 0
   AtkSpeed: 0
   MoveSpeed: 0
+  image: {fileID: 0}
+--- !u!114 &1828788069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828788061}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1fe6f6e17590544b102f7f72e5f1bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileInfoGenerator: {fileID: 1854590796}
 --- !u!1 &1854590790
 GameObject:
   m_ObjectHideFlags: 0
@@ -2081,8 +2148,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilePrefab: {fileID: 1571879869}
-  rows: 0
-  columns: 0
+  rows: 5
+  columns: 5
   gridLayoutGroup: {fileID: 1854590793}
 --- !u!114 &1854590793
 MonoBehaviour:
@@ -2258,6 +2325,7 @@ GameObject:
   - component: {fileID: 1919273642}
   - component: {fileID: 1919273647}
   - component: {fileID: 1919273648}
+  - component: {fileID: 1919273649}
   m_Layer: 5
   m_Name: Player_Prefab
   m_TagString: Untagged
@@ -2449,7 +2517,21 @@ MonoBehaviour:
   Shield: 0
   CritChance: 0
   AtkSpeed: 0
-  MoveSpeed: 0
+  MoveSpeed: 0.1
+  image: {fileID: 0}
+--- !u!114 &1919273649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919273640}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e1fe6f6e17590544b102f7f72e5f1bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileInfoGenerator: {fileID: 1854590796}
 --- !u!1 &1986675246
 GameObject:
   m_ObjectHideFlags: 0

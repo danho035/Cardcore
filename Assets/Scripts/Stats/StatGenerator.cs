@@ -27,7 +27,7 @@ public class StatGenerator : MonoBehaviour
         // 플레이어 스탯 생성 예시
         UnitStats knightStats = new UnitStats("Knight", 4, 0, 1, 18, 5, 2, 0, 0f, 1f, 0.5f);
         UnitStats wizardStats = new UnitStats("Wizard", 4, 0, 1, 12, 8, 2, 0, 0f, 1f, 0.42f);
-        UnitStats thiefStats = new UnitStats("Thief", 4, 0, 1, 14, 6, 2, 0, 0f, 1f, 0.33f);
+        UnitStats thiefStats = new UnitStats("Thief", 4, 0, 1, 14, 6, 2, 0, 0f, 1f, 0.36f);
 
         // 플레이어 스탯 추가
         statManager.AddPlayerStats("Knight", knightStats);

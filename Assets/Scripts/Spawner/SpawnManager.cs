@@ -25,7 +25,7 @@ public class SpawnManager : MonoBehaviour
     public GameObject playerPrefab;
 
     // 스폰에 필요한 소환 카운트
-    public int bossCount;
+    public int  bossCount;
     public int middleCount;
     public int normalCount;
     public int playerCount;
