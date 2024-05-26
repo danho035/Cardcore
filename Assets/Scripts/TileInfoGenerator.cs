@@ -37,8 +37,8 @@ public class TileInfoGenerator : MonoBehaviour
             // 타일 정보 생성
             TileInfo tileInfo = new TileInfo();
             tileInfo.tileName = tileRectTransform.name;
-            tileInfo.column = i / columns;
-            tileInfo.row = i % rows;
+            tileInfo.column = i % columns; // 수정된 열 계산
+            tileInfo.row = i / columns; // 수정된 행 계산
 
             // 타일의 anchoredPosition을 사용하여 실제 위치 가져오기
             tileInfo.posX = tileRectTransform.anchoredPosition.x;
@@ -60,7 +60,7 @@ public class TileInfoGenerator : MonoBehaviour
         public int column;
         public float posX;
         public float posY;
-        public Vector2 tileSize; 
+        public Vector2 tileSize;
         public float spacing;
 
         public override string ToString()
@@ -73,5 +73,18 @@ public class TileInfoGenerator : MonoBehaviour
     public List<TileInfo> GetTileInfos()
     {
         return tileInfos;
+    }
+
+    // 타일이 존재하는지 확인하는 메서드
+    public bool IsTilePresent(Vector2Int tile)
+    {
+        foreach (TileInfo tileInfo in tileInfos)
+        {
+            if (tileInfo.row == tile.y && tileInfo.column == tile.x)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

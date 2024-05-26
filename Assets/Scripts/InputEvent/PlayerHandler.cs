@@ -238,19 +238,19 @@ public class PlayerHandler : MonoBehaviour
             Debug.Log("현재 스와이프 결과: " + InputManager.Gesture_Result);
             if (InputManager.Gesture_Result == Result.up) // UP
             {
-                PlayerMove(playerRow, playerColumn - 1);
+                PlayerMove(playerRow - 1, playerColumn);
             }
             else if (InputManager.Gesture_Result == Result.down) // Down
             {
-                PlayerMove(playerRow, playerColumn + 1);
+                PlayerMove(playerRow + 1, playerColumn);
             }
             else if (InputManager.Gesture_Result == Result.left) // Left
             {
-                PlayerMove(playerRow - 1, playerColumn);
+                PlayerMove(playerRow, playerColumn - 1);
             }
             else if (InputManager.Gesture_Result == Result.right) // Right
             {
-                PlayerMove(playerRow + 1, playerColumn);
+                PlayerMove(playerRow, playerColumn + 1);
             }
             else if (InputManager.Gesture_Result == Result.click)
             {

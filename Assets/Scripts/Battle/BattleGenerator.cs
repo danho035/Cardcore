@@ -202,8 +202,7 @@ public class BattleGenerator : MonoBehaviour
         else
         {
             Debug.LogWarning("BattleGenerator instance already exists. Destroying duplicate.");
-            Destroy(gameObject); // 중복된
-                                 // 인스턴스를 파괴합니다.
+            Destroy(gameObject); // 중복된　인스턴스를 파괴합니다.
         }
     }
 

@@ -5,6 +5,7 @@ public class UnitPositionSet : MonoBehaviour
 {
     public TileInfoGenerator tileInfoGenerator;
 
+
     public List<(string objectName, int row, int column)> unitPositions = new List<(string, int, int)>();
 
     void PositionReset()
